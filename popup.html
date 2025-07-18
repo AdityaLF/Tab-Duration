@@ -1,0 +1,95 @@
+<!--
+  Tab Duration - Copyright © 2025 AdityaLF
+  All rights reserved. See LICENSE file for terms.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tab Duration</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div id="mainView">
+    <div class="header">
+      <h2>Tab Duration</h2>
+      <div class="header-controls">
+        <button id="darkToggleMain">🌙</button>
+        <button id="settingsBtn">⚙️</button>
+      </div>
+    </div>
+
+    <div class="toggle-container three-items">
+      <button class="toggle-btn active" id="dailyBtn">Daily</button>
+      <button class="toggle-btn" id="weeklyBtn">Weekly</button>
+      <button class="toggle-btn" id="monthlyBtn">Monthly</button>
+    </div>
+    
+    <div class="totals-wrapper">
+      <div class="total-time-container" id="main-total-view">
+        <span id="mainTotalLabel">Total Today</span>
+        <span id="mainTotalTime">Calculating...</span>
+      </div>
+      <div id="sub-view-header" style="display: none;">
+        <div class="sub-view-left">
+          <button id="backToMainViewBtn">←</button>
+          <span id="subViewTitle"></span>
+        </div>
+        <span id="subViewTotalTime"></span>
+      </div>
+    </div>
+
+    <ul id="siteList"></ul>
+  </div>
+
+  <div id="settingsView" style="display: none;">
+    <div class="header">
+      <div class="header-placeholder"></div>
+      <h2>Settings</h2>
+      <div class="header-controls">
+        <button id="backBtn" class="close-btn">&times;</button>
+      </div>
+    </div>
+    <div class="settings-content">
+      <div class="setting-group">
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Theme</strong>
+            <span>Switch between dark/light mode</span>
+          </div>
+          <button id="darkToggleSettings" class="theme-toggle">🌙</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Export Data</strong>
+            <span>Save all history as a CSV file</span>
+          </div>
+          <button id="exportBtn" class="action-btn">Export</button>
+        </div>
+        <div class="setting-divider"></div>
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Reset Data</strong>
+            <span>Delete all tracking history</span>
+          </div>
+          <button id="resetBtn" class="danger-btn">Reset</button>
+        </div>
+      </div>
+      <div class="setting-group footer">
+        <a href="https://github.com/adityalf" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="icon">
+            <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          AdityaLF
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
