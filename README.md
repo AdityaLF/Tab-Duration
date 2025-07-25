@@ -31,6 +31,16 @@
 
 ---
 
+## 🌐 Available on Microsoft Edge Add-ons
+
+Tab Duration is now officially available on the Microsoft Edge Add-ons store
+
+👉 [Install from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ifonpipddgdilpjcdjialpjbfknnlcjf)
+
+If you're not using Edge, check the steps below for manual installation.
+
+---
+
 ## 🚀 Installation (Manual Load)
 
 This extension works on all Chromium-based browsers (e.g., **Chrome**, **Brave**, **Edge**)
@@ -69,7 +79,7 @@ After extracting the files, follow these steps to load it into your browser:
 
 * **GitHub**: [@AdityaLF](https://github.com/AdityaLF)
 * **Discord**: [@05.07am](https://discordapp.com/users/786163564205047839)
-* **Support Me**: [ko-fi.com/adityaf](https://ko-fi.com/adityalf)
+* **Support Me**: [ko-fi.com/AdityaLF](https://ko-fi.com/AdityaLF)
 
 ---
 
