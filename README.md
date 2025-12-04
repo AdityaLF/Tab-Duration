@@ -78,7 +78,7 @@ After extracting the files, follow these steps to load it into your browser:
 ## 👤 Author
 
 * **GitHub**: [@AdityaLF](https://github.com/AdityaLF)
-* **Discord**: [@05.07am](https://discordapp.com/users/786163564205047839)
+* **Discord**: [@AdityaLF](https://discordapp.com/users/786163564205047839)
 * **Support Me**: [ko-fi.com/AdityaLF](https://ko-fi.com/AdityaLF)
 
 ---
