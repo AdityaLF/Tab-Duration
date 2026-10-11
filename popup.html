@@ -1,8 +1,3 @@
-<!--
-  Tab Duration - Copyright © 2025 AdityaLF
-  All rights reserved. See LICENSE file for terms.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,14 +5,15 @@
   <title>Tab Duration</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="theme-initializing">
+  <script src="theme.js"></script>
 
   <div id="mainView">
     <div class="header">
       <h2>Tab Duration</h2>
       <div class="header-controls">
-        <button id="darkToggleMain">🌙</button>
-        <button id="settingsBtn">⚙️</button>
+        <button id="darkToggleMain"></button>
+        <button id="settingsBtn"></button>
       </div>
     </div>
 
@@ -59,14 +55,68 @@
             <strong>Theme</strong>
             <span>Switch between dark/light mode</span>
           </div>
-          <button id="darkToggleSettings" class="theme-toggle">🌙</button>
+          <button id="darkToggleSettings" class="theme-toggle"></button>
         </div>
       </div>
+
+      <div class="setting-group">
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Track All Web</strong>
+            <span>Track all visited websites</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="trackAllWebToggle" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="setting-divider"></div>
+        <div class="setting-row">
+          <div class="setting-label">
+            <strong>Pause When Inactive</strong>
+            <span>Pause after 60 seconds without keyboard or mouse activity. (Video watching without interaction may not be counted.)</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="trackOnlyWhileActiveToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div id="notifDivider" class="setting-divider" style="display: none;"></div>
+        <div id="enableNotifRow" class="setting-row" style="display: none;">
+          <div class="setting-label">
+            <strong>Suggest New Sites</strong>
+            <span>Ask whether to track sites not on your lists</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enableNotifToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div id="whitelistRow" class="setting-row" style="display: none;">
+          <div class="setting-label">
+            <strong>Whitelist</strong>
+            <span>Sites to be tracked</span>
+          </div>
+          <button id="manageWhitelistBtn" class="action-btn">Manage</button>
+        </div>
+        <div id="listDivider" class="setting-divider" style="display: none;"></div>
+        <div id="ignorelistRow" class="setting-row">
+          <div class="setting-label">
+            <strong>Ignore List</strong>
+            <span>Sites to never track</span>
+          </div>
+          <button id="manageIgnorelistBtn" class="action-btn">Manage</button>
+        </div>
+      </div>
+
       <div class="setting-group">
         <div class="setting-row">
           <div class="setting-label">
             <strong>Export Data</strong>
-            <span>Save all history as a CSV file</span>
+            <span>Export history kept for the last 31 days</span>
           </div>
           <button id="exportBtn" class="action-btn">Export</button>
         </div>
@@ -79,16 +129,44 @@
           <button id="resetBtn" class="danger-btn">Reset</button>
         </div>
       </div>
-      <div class="setting-group footer">
-        <a href="https://github.com/adityalf" target="_blank">
+    </div>
+    <div class="setting-group footer">
+        <a href="https://github.com/AdityaLF/Tab-Duration" target="_blank">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="icon">
             <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
           </svg>
           AdityaLF
         </a>
+    </div>
+  </div>
+
+  <div id="listsView" style="display: none;">
+    <div class="header">
+      <button id="backToListsBtn" class="back-arrow">←</button>
+      <h2 id="listsViewTitle">Manage List</h2>
+      <div class="header-placeholder"></div>
+    </div>
+    <div class="settings-content">
+      <div class="list-input-container">
+        <input type="text" id="listSiteInput" placeholder="example.com">
+        <button id="addSiteBtn" class="add-btn">+</button>
+      </div>
+      <div class="setting-divider"></div>
+      <ul id="managedSiteList" class="settings-list"></ul>
+    </div>
+  </div>
+
+  <div id="moveSiteDialog" class="dialog-backdrop" hidden>
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="moveSiteDomain">
+      <p><strong id="moveSiteDomain"></strong><span id="moveSitePrompt"></span></p>
+      <div class="dialog-actions">
+        <button id="cancelMoveSiteBtn" class="dialog-cancel-btn">Cancel</button>
+        <button id="confirmMoveSiteBtn" class="dialog-confirm-btn">Move</button>
       </div>
     </div>
   </div>
+
+  <div id="toastMessage" class="toast">Invalid domain name</div>
 
   <script src="popup.js"></script>
 </body>

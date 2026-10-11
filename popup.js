@@ -1,6 +1,3 @@
-// Tab Duration - Copyright © 2025 AdityaLF
-// All rights reserved. See LICENSE for terms.
-
 // --- STATE MANAGEMENT ---
 let appState = {
   currentView: 'daily',
@@ -11,6 +8,7 @@ let appState = {
 // --- DOM ELEMENTS ---
 const mainView = document.getElementById("mainView");
 const settingsView = document.getElementById("settingsView");
+const listsView = document.getElementById("listsView");
 const dailyBtn = document.getElementById("dailyBtn");
 const weeklyBtn = document.getElementById("weeklyBtn");
 const monthlyBtn = document.getElementById("monthlyBtn");
@@ -29,16 +27,83 @@ const exportBtn = document.getElementById("exportBtn");
 const darkToggleMain = document.getElementById("darkToggleMain");
 const darkToggleSettings = document.getElementById("darkToggleSettings");
 
+// --- NEW DOM ELEMENTS ---
+const trackAllWebToggle = document.getElementById("trackAllWebToggle");
+const trackOnlyWhileActiveToggle = document.getElementById("trackOnlyWhileActiveToggle");
+const notifDivider = document.getElementById("notifDivider");
+const enableNotifRow = document.getElementById("enableNotifRow");
+const enableNotifToggle = document.getElementById("enableNotifToggle");
+const whitelistRow = document.getElementById("whitelistRow");
+const listDivider = document.getElementById("listDivider");
+const manageWhitelistBtn = document.getElementById("manageWhitelistBtn");
+const manageIgnorelistBtn = document.getElementById("manageIgnorelistBtn");
+
+// --- LISTS VIEW ELEMENTS ---
+const backToListsBtn = document.getElementById("backToListsBtn");
+const listsViewTitle = document.getElementById("listsViewTitle");
+const listSiteInput = document.getElementById("listSiteInput");
+const addSiteBtn = document.getElementById("addSiteBtn");
+const managedSiteList = document.getElementById("managedSiteList");
+const toastMessage = document.getElementById("toastMessage");
+const moveSiteDialog = document.getElementById("moveSiteDialog");
+const moveSiteDomain = document.getElementById("moveSiteDomain");
+const moveSitePrompt = document.getElementById("moveSitePrompt");
+const cancelMoveSiteBtn = document.getElementById("cancelMoveSiteBtn");
+const confirmMoveSiteBtn = document.getElementById("confirmMoveSiteBtn");
+
+let currentActiveList = "whitelist";
+let onConfirmMoveSite = null;
+
 // --- UTILITY FUNCTIONS ---
 function formatTime(seconds) {
+  if (seconds < 60) return `${seconds}s`;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  const s = seconds % 60;
+  const formattedTime = h > 0 ? `${h}h ${m}m` : `${m}m`;
+  return s > 0 ? `${formattedTime} ${s}s` : formattedTime;
 }
 
-function getFavicon(domain) {
-  return `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
+function getLocalDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getFaviconUrl(domain, size) {
+  return `https://www.google.com/s2/favicons?sz=${size}&domain=${encodeURIComponent(domain)}`;
+}
+
+function hideUnavailableFavicons(container) {
+  container.querySelectorAll(".site-icon-image").forEach((image) => {
+    image.addEventListener("error", () => {
+      image.hidden = true;
+    }, { once: true });
+    image.src = image.dataset.faviconUrl;
+    delete image.dataset.faviconUrl;
+  });
+}
+
+function showToast(message) {
+  toastMessage.textContent = message;
+  toastMessage.classList.add("show");
+  setTimeout(() => {
+    toastMessage.classList.remove("show");
+  }, 3000);
+}
+
+function closeMoveSiteDialog() {
+  moveSiteDialog.hidden = true;
+  onConfirmMoveSite = null;
+}
+
+function showMoveSiteDialog(domain, sourceList, targetList, onConfirm) {
+  moveSiteDomain.textContent = domain;
+  moveSitePrompt.textContent = ` is in ${sourceList}. Move to ${targetList}?`;
+  onConfirmMoveSite = onConfirm;
+  moveSiteDialog.hidden = false;
+  confirmMoveSiteBtn.focus();
 }
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -72,7 +137,7 @@ function render() {
 }
 
 function renderDailyView(allData) {
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = getLocalDateString(new Date());
   const todayData = allData[todayStr] || {};
   mainTotalLabel.textContent = 'Total Today';
   renderSiteList(todayData);
@@ -89,7 +154,7 @@ function renderWeekView(allData) {
   for (let i = 0; i < 7; i++) {
     const date = new Date(firstDayOfWeek);
     date.setDate(date.getDate() + i);
-    const dateStr = date.toISOString().slice(0, 10);
+    const dateStr = getLocalDateString(date);
     const dayData = allData[dateStr] || {};
     let dayTotalSeconds = Object.values(dayData).reduce((sum, s) => sum + s, 0);
     weeklyTotalSeconds += dayTotalSeconds;
@@ -118,7 +183,7 @@ function renderMonthView(allData) {
   for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
     const date = new Date(firstDayOfMonth);
     date.setDate(i);
-    const dateStr = date.toISOString().slice(0, 10);
+    const dateStr = getLocalDateString(date);
     const dayData = allData[dateStr] || {};
     let dayTotalSeconds = Object.values(dayData).reduce((sum, s) => sum + s, 0);
     monthlyTotalSeconds += dayTotalSeconds;
@@ -142,7 +207,8 @@ function renderDayDetail(allData, dateStr) {
   const dayTotalSeconds = Object.values(dayData).reduce((sum, s) => sum + s, 0);
 
   // Populate sub-header content
-  subViewTitle.textContent = `${dayNames[new Date(dateStr+'T12:00:00Z').getUTCDay()]}, ${dateStr}`;
+  const [year, month, day] = dateStr.split('-').map(Number);
+  subViewTitle.textContent = `${dayNames[new Date(year, month - 1, day).getDay()]}, ${dateStr}`;
   subViewTotalTime.textContent = formatTime(dayTotalSeconds);
 
   // Render the site list for the selected day
@@ -158,11 +224,14 @@ function renderSiteList(data, updateTotal = true) {
     siteList.innerHTML = sorted.map(([domain, seconds]) => {
       totalSeconds += seconds;
       return `<li>
-          <img src="${getFavicon(domain)}" class="favicon" />
+          <span class="site-icon" aria-hidden="true">
+            <img class="site-icon-image" data-favicon-url="${getFaviconUrl(domain, 32)}" alt="">
+          </span>
           <span class="domain">${domain}</span>
           <span class="duration">${formatTime(seconds)}</span>
         </li>`;
     }).join('');
+    hideUnavailableFavicons(siteList);
   }
 
   if (updateTotal) {
@@ -204,7 +273,7 @@ function setupEventListeners() {
   
   settingsBtn.addEventListener("click", () => {
     mainView.style.display = "none";
-    settingsView.style.display = "block";
+    settingsView.style.display = "flex";
   });
 
   backBtn.addEventListener("click", () => {
@@ -214,8 +283,18 @@ function setupEventListeners() {
   
   resetBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to delete all data? This action cannot be undone.")) {
-      chrome.storage.local.remove(["dailyTimeData"], () => {
-        alert("All data has been reset.");
+      chrome.runtime.sendMessage({ action: "resetTrackedData" }, (response) => {
+        if (chrome.runtime.lastError || !response || !response.success) {
+          const error = chrome.runtime.lastError
+            ? chrome.runtime.lastError.message
+            : response && response.error
+              ? response.error
+              : "Unknown error";
+          showToast(`Failed to reset data: ${error}`);
+          return;
+        }
+
+        showToast("All data has been reset");
         appState.subView = null;
         appState.currentView = 'daily';
         Object.values(toggleButtons).forEach(b => b.classList.remove('active'));
@@ -229,6 +308,225 @@ function setupEventListeners() {
 
   darkToggleMain.addEventListener("click", toggleDarkMode);
   darkToggleSettings.addEventListener("click", toggleDarkMode);
+
+  // --- SETTINGS EVENT LISTENERS ---
+  trackAllWebToggle.addEventListener("change", () => {
+    const enabled = trackAllWebToggle.checked;
+    chrome.storage.local.set({ trackAllWeb: enabled });
+    updateSettingsVisibility(enabled);
+  });
+
+  trackOnlyWhileActiveToggle.addEventListener("change", () => {
+    chrome.storage.local.set({ trackOnlyWhileActive: trackOnlyWhileActiveToggle.checked });
+  });
+
+  enableNotifToggle.addEventListener("change", () => {
+    chrome.storage.local.set({ enableNotif: enableNotifToggle.checked });
+  });
+
+  manageWhitelistBtn.addEventListener("click", () => {
+    openListView("whitelist");
+  });
+
+  manageIgnorelistBtn.addEventListener("click", () => {
+    openListView("ignorelist");
+  });
+
+  backToListsBtn.addEventListener("click", () => {
+    listsView.style.display = "none";
+    settingsView.style.display = "flex";
+  });
+
+  cancelMoveSiteBtn.addEventListener("click", closeMoveSiteDialog);
+
+  confirmMoveSiteBtn.addEventListener("click", () => {
+    const onConfirm = onConfirmMoveSite;
+    closeMoveSiteDialog();
+    if (onConfirm) onConfirm();
+  });
+
+  moveSiteDialog.addEventListener("click", (event) => {
+    if (event.target === moveSiteDialog) closeMoveSiteDialog();
+  });
+
+  const handleAddSite = () => {
+    let domain = listSiteInput.value.trim().toLowerCase();
+    
+    // If it's a full URL, extract only the hostname
+    try {
+      if (domain.includes("://")) {
+        const urlObj = new URL(domain);
+        domain = urlObj.hostname;
+      } else if (domain.includes("/")) {
+        // Handle cases like "example.com/path" without protocol
+        domain = domain.split("/")[0];
+      }
+    } catch (e) {
+      // If URL parsing fails, keep original domain string for regex check
+    }
+
+    domain = domain.replace(/^www\./, '');
+
+    // Strict Character Filtering
+    const domainRegex = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,}$/;
+    
+    // Length Limit
+    const isTooLong = domain.length > 100;
+    
+    if (domain && domainRegex.test(domain) && !isTooLong) {
+      addToList(currentActiveList, domain, () => {
+        listSiteInput.value = "";
+        refreshManagedList();
+      });
+    } else if (isTooLong) {
+      showToast("Domain name is too long");
+    } else if (domain) {
+      showToast("Invalid domain");
+    }
+  };
+
+  addSiteBtn.addEventListener("click", handleAddSite);
+
+  listSiteInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      handleAddSite();
+    }
+  });
+}
+
+function openListView(type) {
+  currentActiveList = type;
+  settingsView.style.display = "none";
+  listsView.style.display = "block";
+  
+  if (type === "whitelist") {
+    listsViewTitle.textContent = "Manage Whitelist";
+    listSiteInput.placeholder = "example.com";
+  } else {
+    listsViewTitle.textContent = "Manage Ignore List";
+    listSiteInput.placeholder = "example.com";
+  }
+  
+  refreshManagedList();
+}
+
+function refreshManagedList() {
+  chrome.storage.local.get(currentActiveList, (result) => {
+    const list = result[currentActiveList] || [];
+    renderManagedList(list);
+  });
+}
+
+function renderManagedList(list) {
+  managedSiteList.innerHTML = list.map(domain => `
+    <li class="setting-row">
+      <span class="site-icon" aria-hidden="true">
+        <img class="site-icon-image" data-favicon-url="${getFaviconUrl(domain, 32)}" alt="">
+      </span>
+      <span style="flex: 1;">${domain}</span>
+      <button class="remove-btn" data-domain="${domain}">&times;</button>
+    </li>
+  `).join('');
+
+  hideUnavailableFavicons(managedSiteList);
+  managedSiteList.querySelectorAll(".remove-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      removeFromList(currentActiveList, btn.dataset.domain, () => {
+        refreshManagedList();
+        showToast("Site removed");
+      });
+    });
+  });
+}
+
+function addToList(listName, domain, callback) {
+  const otherListName = listName === "whitelist" ? "ignorelist" : "whitelist";
+  const listLabel = listName === "whitelist" ? "Whitelist" : "Ignore List";
+  const otherListLabel = otherListName === "whitelist" ? "Whitelist" : "Ignore List";
+  const cleanDomain = normalizeDomain(domain);
+
+  chrome.storage.local.get([listName, otherListName], (result) => {
+    const list = result[listName] || [];
+    const otherList = result[otherListName] || [];
+
+    const targetEntries = list.filter((entry) => domainsOverlap(cleanDomain, entry));
+    let moveDomain = [cleanDomain, ...targetEntries.map(normalizeDomain)]
+      .sort((a, b) => a.length - b.length)[0];
+    let conflictingDomains = [];
+    let previousMoveDomain;
+
+    do {
+      previousMoveDomain = moveDomain;
+      conflictingDomains = otherList.filter((entry) => domainsOverlap(moveDomain, entry));
+      moveDomain = [moveDomain, ...conflictingDomains.map(normalizeDomain)]
+        .sort((a, b) => a.length - b.length)[0];
+    } while (moveDomain !== previousMoveDomain);
+
+    if (conflictingDomains.length === 0 && list.some((entry) => isDomainCoveredByEntry(cleanDomain, entry))) {
+      showToast(`Site is already in ${listLabel}.`);
+      return;
+    }
+
+    const addSite = () => {
+      const updatedList = list.filter((entry) => !isDomainCoveredByEntry(entry, moveDomain));
+      updatedList.push(moveDomain);
+      const updatedOtherList = otherList.filter((entry) => !domainsOverlap(moveDomain, entry));
+      chrome.storage.local.set({
+        [listName]: updatedList,
+        [otherListName]: updatedOtherList
+      }, () => {
+        callback();
+        showToast(conflictingDomains.length > 0 ? `Site moved to ${listLabel}.` : "Site added successfully.");
+      });
+    };
+
+    if (conflictingDomains.length > 0) {
+      showMoveSiteDialog(moveDomain, otherListLabel, listLabel, addSite);
+      return;
+    }
+
+    addSite();
+  });
+}
+
+function normalizeDomain(domain) {
+  return domain.replace(/^www\./, '').toLowerCase();
+}
+
+function isDomainCoveredByEntry(domain, entry) {
+  const cleanDomain = normalizeDomain(domain);
+  const cleanEntry = normalizeDomain(entry);
+  return cleanDomain === cleanEntry || cleanDomain.endsWith(`.${cleanEntry}`);
+}
+
+function domainsOverlap(domain, entry) {
+  const cleanDomain = normalizeDomain(domain);
+  const cleanEntry = normalizeDomain(entry);
+  return isDomainCoveredByEntry(cleanDomain, cleanEntry) ||
+    isDomainCoveredByEntry(cleanEntry, cleanDomain);
+}
+
+function removeFromList(listName, domain, callback) {
+  chrome.storage.local.get(listName, (result) => {
+    let list = result[listName] || [];
+    list = list.filter(d => d !== domain);
+    chrome.storage.local.set({ [listName]: list }, callback);
+  });
+}
+
+function updateSettingsVisibility(trackAll) {
+  settingsView.classList.toggle("track-all-disabled", !trackAll);
+  if (trackAll) {
+    notifDivider.style.display = "none";
+    enableNotifRow.style.display = "none";
+    whitelistRow.style.display = "none";
+    listDivider.style.display = "none";
+  } else {
+    notifDivider.style.display = "block";
+    enableNotifRow.style.display = "flex";
+    whitelistRow.style.display = "flex";
+    listDivider.style.display = "block";
+  }
 }
 
 // --- EXPORT CSV ---
@@ -236,7 +534,7 @@ function exportDataToCSV() {
   chrome.storage.local.get("dailyTimeData", (result) => {
     const data = result.dailyTimeData || {};
     if (Object.keys(data).length === 0) {
-      alert("No data to export.");
+      showToast("No data to export");
       return;
     }
 
@@ -273,20 +571,27 @@ function exportDataToCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    showToast("CSV Exported successfully");
   });
 }
+
+// --- ICONS ---
+const MOON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+const SUN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M22 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+const SETTINGS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`;
 
 // --- TOGGLE DARK MODE ---
 function setDarkMode(isDark) {
   if (isDark) {
     document.body.classList.add("dark");
-    darkToggleMain.textContent = "☀️";
-    darkToggleSettings.textContent = "☀️";
+    darkToggleMain.innerHTML = SUN_SVG;
+    darkToggleSettings.innerHTML = SUN_SVG;
   } else {
     document.body.classList.remove("dark");
-    darkToggleMain.textContent = "🌙";
-    darkToggleSettings.textContent = "🌙";
+    darkToggleMain.innerHTML = MOON_SVG;
+    darkToggleSettings.innerHTML = MOON_SVG;
   }
+  localStorage.setItem("darkMode", String(isDark === true));
 }
 
 function toggleDarkMode() {
@@ -299,7 +604,26 @@ function toggleDarkMode() {
 document.addEventListener("DOMContentLoaded", () => {
   setupEventListeners();
   render(); // Initial render (defaults to daily view)
-  chrome.storage.local.get("darkMode", (result) => {
+  settingsBtn.innerHTML = SETTINGS_SVG;
+  chrome.storage.local.get(["darkMode", "trackAllWeb", "trackOnlyWhileActive", "trackWhileIdle", "enableNotif"], (result) => {
     setDarkMode(result.darkMode);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove("theme-initializing");
+      });
+    });
+
+    // Default trackAllWeb to true if undefined
+    const trackAll = result.trackAllWeb !== false;
+    trackAllWebToggle.checked = trackAll;
+    updateSettingsVisibility(trackAll);
+
+    trackOnlyWhileActiveToggle.checked = typeof result.trackOnlyWhileActive === "boolean"
+      ? result.trackOnlyWhileActive
+      : result.trackWhileIdle === false;
+
+    // Default enableNotif to true if undefined
+    const enableNotif = result.enableNotif !== false;
+    enableNotifToggle.checked = enableNotif;
   });
 });

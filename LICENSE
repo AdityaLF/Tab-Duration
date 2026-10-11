@@ -1,17 +1,21 @@
-Copyright © 2025 AdityaLF (https://github.com/AdityaLF)
+MIT License
 
-This browser extension, "Tab Duration", and all associated source code are the intellectual property of AdityaLF.
+Copyright (c) 2025 AdityaLF
 
-You are NOT allowed to:
-- Re-upload this extension or its source code, in part or in full, to any public or private repository (including GitHub, GitLab, etc.)
-- Modify and redistribute the extension under your own name, brand, or GitHub profile.
-- Use this extension’s source code for commercial purposes (such as reselling, sublicensing, or including in a paid product) without explicit written permission from the author.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-You ARE allowed to:
-- Use the extension for personal, non-commercial use.
-- Study the source code privately for learning purposes.
-- Use the extension in a company or organization for internal workflow (non-commercial use only), as long as it is not modified, rebranded, or redistributed outside the organization.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Any violation of these terms will be considered copyright infringement and may result in a DMCA takedown request or legal action.
-
-For licensing inquiries, contact: adityaalf9@gmail.com
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

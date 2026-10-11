@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Tab Duration",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Tracks time spent on websites.",
-  "author": "AdityaLF (https://github.com/AdityaLF)",
+  "author": "AdityaLF",
   "homepage_url": "https://github.com/AdityaLF/Tab-Duration",
   "permissions": [
     "tabs",
@@ -12,11 +12,19 @@
     "alarms"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "http://*/*",
+    "https://*/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

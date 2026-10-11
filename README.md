@@ -1,21 +1,14 @@
 <p align="center">
-  <img src="https://i.imgur.com/92PcbGV.png" width="120" alt="Tab Duration Icon"/>
+  <img src="./icons/icon128.png" width="120" alt="Tab Duration Icon"/>
 </p>
 <h1 align="center">Tab Duration</h1>
-<p align="center">An extension to track your browsing time, Tab Duration offers clean daily, weekly, and monthly insights to help you understand your online habits. It works seamlessly across Chromium-based browsers and runs entirely locally.</p>
+<p align="center">An extension to track your browsing time, Tab Duration offers daily, weekly, and monthly insights to help you understand your online habits. Browsing time and settings are stored locally on your device.</p>
 
----
+## Preview
 
-## 🔍 Preview
+<img src="./images/preview.gif" width="400" alt="Tab Duration preview" />
 
-<img src="https://i.imgur.com/H0LhXK8.gif" width="400" />
-
-> [!NOTE]
-> No data is ever sent to an external server. This extension stores all data locally on your device. 
-
----
-
-## ✨ Features
+## Features
 
 - **Automatic Time Tracking**: Tracks time spent on active tabs without any manual input.
 - **Multiple Views**:
@@ -24,42 +17,27 @@
     - **Monthly**: See your daily totals for the entire current month.
 - **Detailed Drill-Down**: Click on any day in the weekly or monthly view to see the specific site data for that day.
 - **Dark & Light Mode**: Switch between themes based on your preference.
+- **Website Lists**: Ignore specific sites, or turn off Track All Web to track only sites on your optional whitelist.
 - **Data Management**:
-    - **Export to CSV**: Download your browsing time history as a CSV file, perfect for viewing and analyzing in Excel.
+    - **Export to CSV**: Download your browsing time history as a CSV file for viewing and analyzing in Excel.
     - **Reset Data**: Clear all tracked data easily.
+- **Pause When Inactive**: Optional setting that pauses tracking after 60 seconds without user activity.
 - **Zero Dependencies**: Built with vanilla JavaScript, HTML, and CSS.
 
----
+## Installation
 
-## 🌐 Available on Microsoft Edge Add-ons
+**Microsoft Edge:** [Install from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ifonpipddgdilpjcdjialpjbfknnlcjf)
 
-Tab Duration is now officially available on the Microsoft Edge Add-ons store
+### Manual Installation
 
-👉 [Install from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ifonpipddgdilpjcdjialpjbfknnlcjf)
-
-If you're not using Edge, check the steps below for manual installation.
-
----
-
-## 🚀 Installation (Manual Load)
-
-This extension works on all Chromium-based browsers (e.g., **Chrome**, **Brave**, **Edge**)
-
-### Option 1: ZIP File (Recommended for most users)
-
-1.  **Download the Code:** [Click here to download the project as a ZIP file](https://github.com/AdityaLF/Tab-Duration/archive/refs/heads/main.zip).
-2.  **Unzip the File:** Extract the contents of the ZIP file to a folder on your computer.
-
-### Option 2: Git Clone (For developers)
-
-1.  **Clone the Repository:** Open your terminal and run the following command:
-    ```bash
-    git clone https://github.com/AdityaLF/Tab-Duration.git
-    ```
+1.  **Download the Extension:** Choose the ZIP for your browser from the [GitHub Releases page](https://github.com/AdityaLF/Tab-Duration/releases).
+2.  **Extract the ZIP file.**
 
 ### Loading the Extension
 
-After extracting the files, follow these steps to load it into your browser:
+After extracting the ZIP, follow the steps for your browser.
+
+#### Chrome, Brave, and Microsoft Edge
 
 1.  **Open the Extensions Page:**
     * In **Chrome** or **Brave**, navigate to `chrome://extensions`
@@ -69,23 +47,14 @@ After extracting the files, follow these steps to load it into your browser:
 
 3.  **Load the Extension:**
     * Click the **"Load unpacked"** button.
-    * Select the folder where you unzipped or cloned the project (e.g., `Tab-Duration`).
+    * Select the folder where you extracted the ZIP.
 
-✅ The Tab-Duration icon will now appear in your browser's toolbar!
+The Tab-Duration icon will now appear in your browser's toolbar.
 
----
+## Privacy
 
-## 👤 Author
+Read the [Privacy Policy](./PRIVACY_POLICY.md) for information about local data storage, favicon requests, and data retention.
 
-* **GitHub**: [@AdityaLF](https://github.com/AdityaLF)
-* **Discord**: [@AdityaLF](https://discordapp.com/users/786163564205047839)
-* **Support Me**: [ko-fi.com/AdityaLF](https://ko-fi.com/AdityaLF)
+## License
 
----
-
-## 📄 License
-
-This project is **not open source**. All code, assets, and content are the intellectual property of **AdityaLF**.
-
-Usage is subject to the terms described in the [LICENSE](./LICENSE) file.  
-Unauthorized modification, redistribution, or commercial use is strictly prohibited.
+Tab Duration is licensed under the [MIT License](./LICENSE).

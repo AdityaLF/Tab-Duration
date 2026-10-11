@@ -1,21 +1,21 @@
-# Privacy Policy for Tab Duration
+# Privacy Policy
 
-Last updated: July 18, 2025
+Tab Duration stores browsing-time records and extension settings in the browser's local extension storage. It does not upload browsing history or time-tracking records to a Tab Duration server, and it does not use analytics.
 
-This Privacy Policy describes how the "Tab Duration" extension handles your information.
+## Information stored locally
 
-## Data Collection and Storage
+The extension stores daily time totals by website domain, tracking settings such as Track All Web and Pause When Inactive, the selected dark or light theme, whitelist and ignore-list entries, and notification dismissal timestamps. Temporary tracking state is stored in the browser's session storage.
 
-The "Tab Duration" extension tracks the domains you visit and the time you spend on them. This data includes:
-- The domain name of the website (e.g., "google.com")
-- The total time spent on that domain each day
+The extension reads the active tab's URL and browser focus state to decide which domain to track and whether to show a site suggestion.
 
-All of this data is stored **locally on your own computer** using the browser's built-in storage.
+## Favicon requests
 
-## Data Transmission
+To display website icons, the extension requests favicons from Google's favicon service at `https://www.google.com/s2/favicons`. The website domain is included in the request. Google therefore receives the requested domain and may receive standard connection information, such as the request's IP address. These requests are subject to Google's privacy practices.
 
-This extension **does not transmit, send, or share your data with any external server or third party**. All your usage data remains private and confined to your local machine.
+The extension sends favicon requests only to retrieve site icons. A requested domain is disclosed in that request, but time totals, the full browsing history, and extension settings are not sent.
 
-## Contact Us
+## Retention and deletion
 
-If you have any questions about this Privacy Policy, you can contact adityaalf9@gmail.com
+Time-tracking records older than 31 days are automatically removed. CSV export includes the records that are still stored when the export is created. Use Reset Data to remove the stored time-tracking records sooner.
+
+Extension settings and list entries remain stored until changed or removed by the user, or until the extension's browser data is removed.

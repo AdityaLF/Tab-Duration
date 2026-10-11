@@ -1,0 +1,230 @@
+#tab-duration-suggestion {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 260px;
+  background: rgba(30, 30, 30, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  z-index: 2147483647;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: white;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: td-slide-in 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  transition: opacity 0.8s, transform 0.8s;
+}
+
+#tab-duration-suggestion.td-light {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  color: #18181b;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+#tab-duration-suggestion.td-closing {
+  animation: td-slide-out 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes td-slide-in {
+  from { transform: translateY(-150%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes td-slide-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-150%); opacity: 0; }
+}
+
+.td-top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.td-app-name {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+#tab-duration-suggestion.td-light .td-app-name {
+  color: #71717a;
+}
+
+.td-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.td-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+#tab-duration-suggestion.td-light .td-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.td-site-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.td-site-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.td-site-icon-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: contain;
+}
+
+.td-site-name {
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  flex: 1;
+}
+
+#tab-duration-suggestion.td-light .td-site-name {
+  color: #18181b;
+}
+
+.td-menu-container {
+  position: relative;
+}
+
+.td-dots {
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 4px;
+  user-select: none;
+}
+
+.td-dots:hover {
+  color: white;
+}
+
+#tab-duration-suggestion.td-light .td-dots {
+  color: #71717a;
+}
+
+#tab-duration-suggestion.td-light .td-dots:hover {
+  color: #18181b;
+}
+
+.td-dropdown {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  background: #2a2a2a;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+#tab-duration-suggestion.td-light .td-dropdown {
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.td-dropdown-item {
+  padding: 10px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #eee;
+  text-align: left;
+}
+
+#tab-duration-suggestion.td-light .td-dropdown-item {
+  color: #27272a;
+}
+
+.td-dropdown-item:hover {
+  background: #3a3a3a;
+}
+
+#tab-duration-suggestion.td-light .td-dropdown-item:hover {
+  background: #f4f4f5;
+}
+
+.td-close {
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px;
+  user-select: none;
+}
+
+#tab-duration-suggestion.td-light .td-close {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.td-close:hover {
+  color: white;
+}
+
+#tab-duration-suggestion.td-light .td-close:hover {
+  color: #18181b;
+}
+
+.td-button-row {
+  width: 100%;
+}
+
+.td-add-action {
+  font-size: 13px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.td-add-action:hover {
+  background: #0069d9;
+}
+
+.td-add-action:active {
+  transform: scale(0.98);
+}
