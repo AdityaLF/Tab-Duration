@@ -6,7 +6,7 @@
 
 ## Preview
 
-<img src="./images/preview.gif" width="400" alt="Tab Duration preview" />
+<img src="./images/preview.gif" width="300" alt="Tab Duration preview" />
 
 ## Features
 
@@ -18,15 +18,17 @@
 - **Detailed Drill-Down**: Click on any day in the weekly or monthly view to see the specific site data for that day.
 - **Dark & Light Mode**: Switch between themes based on your preference.
 - **Website Lists**: Ignore specific sites, or turn off Track All Web to track only sites on your optional whitelist.
+- **Pause When Inactive**: Optional setting that pauses tracking after 60 seconds without user activity.
 - **Data Management**:
     - **Export to CSV**: Download your browsing time history as a CSV file for viewing and analyzing in Excel.
     - **Reset Data**: Clear all tracked data easily.
-- **Pause When Inactive**: Optional setting that pauses tracking after 60 seconds without user activity.
 - **Zero Dependencies**: Built with vanilla JavaScript, HTML, and CSS.
 
 ## Installation
 
-**Microsoft Edge:** [Install from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ifonpipddgdilpjcdjialpjbfknnlcjf)
+- **Microsoft Edge:** [Install from Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ifonpipddgdilpjcdjialpjbfknnlcjf)
+
+- **Firefox:** [Install from Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/tab-duration/)
 
 ### Manual Installation
 
@@ -50,6 +52,14 @@ After extracting the ZIP, follow the steps for your browser.
     * Select the folder where you extracted the ZIP.
 
 The Tab-Duration icon will now appear in your browser's toolbar.
+
+#### Firefox
+
+1.  Open `about:debugging#/runtime/this-firefox` in Firefox.
+2.  Click **"Load Temporary Add-on..."**.
+3.  Select the `manifest.json` file in the extracted extension folder.
+
+A temporary add-on is removed when Firefox closes.
 
 ## Privacy
 
