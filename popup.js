@@ -85,6 +85,64 @@ function hideUnavailableFavicons(container) {
   });
 }
 
+function updateOverflowPadding(element) {
+  element.classList.toggle("has-vertical-overflow", element.scrollHeight > element.clientHeight);
+}
+
+function watchOverflow(element) {
+  const update = () => updateOverflowPadding(element);
+  const resizeObserver = new ResizeObserver(update);
+  resizeObserver.observe(element);
+
+  const mutationObserver = new MutationObserver(update);
+  mutationObserver.observe(element, {
+    attributes: true,
+    characterData: true,
+    childList: true,
+    subtree: true
+  });
+
+  update();
+}
+
+watchOverflow(siteList);
+watchOverflow(settingsView.querySelector(".settings-content"));
+watchOverflow(managedSiteList);
+
+function createPopupElement(tagName, className, text) {
+  const element = document.createElement(tagName);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+}
+
+function createDayListItem(dateString, dayName, seconds) {
+  const item = createPopupElement("li", "day-item");
+  item.dataset.date = dateString;
+  const details = createPopupElement("div");
+  details.append(
+    createPopupElement("div", "day-name", dayName),
+    createPopupElement("div", "day-date", dateString)
+  );
+  item.append(details, createPopupElement("div", "day-duration", formatTime(seconds)));
+  return item;
+}
+
+function createFavicon(domain) {
+  const icon = createPopupElement("span", "site-icon");
+  icon.setAttribute("aria-hidden", "true");
+  const image = createPopupElement("img", "site-icon-image");
+  image.dataset.faviconUrl = getFaviconUrl(domain, 32);
+  image.alt = "";
+  icon.appendChild(image);
+  return icon;
+}
+
+function createPopupSvg(markup) {
+  const svg = new DOMParser().parseFromString(markup, "image/svg+xml").documentElement;
+  return document.importNode(svg, true);
+}
+
 function showToast(message) {
   toastMessage.textContent = message;
   toastMessage.classList.add("show");
@@ -149,7 +207,7 @@ function renderWeekView(allData) {
   firstDayOfWeek.setDate(today.getDate() - today.getDay());
 
   let weeklyTotalSeconds = 0;
-  let dayItemsHtml = '';
+  const dayItems = document.createDocumentFragment();
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(firstDayOfWeek);
@@ -159,18 +217,11 @@ function renderWeekView(allData) {
     let dayTotalSeconds = Object.values(dayData).reduce((sum, s) => sum + s, 0);
     weeklyTotalSeconds += dayTotalSeconds;
 
-    dayItemsHtml += `
-      <li class="day-item" data-date="${dateStr}">
-        <div>
-          <div class="day-name">${dayNames[date.getDay()]}</div>
-          <div class="day-date">${dateStr}</div>
-        </div>
-        <div class="day-duration">${formatTime(dayTotalSeconds)}</div>
-      </li>`;
+    dayItems.appendChild(createDayListItem(dateStr, dayNames[date.getDay()], dayTotalSeconds));
   }
   mainTotalLabel.textContent = 'Total This Week';
   mainTotalTime.textContent = formatTime(weeklyTotalSeconds);
-  siteList.innerHTML = dayItemsHtml;
+  siteList.replaceChildren(dayItems);
 }
 
 function renderMonthView(allData) {
@@ -178,7 +229,7 @@ function renderMonthView(allData) {
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   let monthlyTotalSeconds = 0;
-  let dayItemsHtml = '';
+  const dayItems = document.createDocumentFragment();
   
   for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
     const date = new Date(firstDayOfMonth);
@@ -188,18 +239,11 @@ function renderMonthView(allData) {
     let dayTotalSeconds = Object.values(dayData).reduce((sum, s) => sum + s, 0);
     monthlyTotalSeconds += dayTotalSeconds;
 
-      dayItemsHtml += `
-      <li class="day-item" data-date="${dateStr}">
-        <div>
-          <div class="day-name">${dayNames[date.getDay()]}</div>
-          <div class="day-date">${dateStr}</div>
-        </div>
-        <div class="day-duration">${formatTime(dayTotalSeconds)}</div>
-      </li>`;
+    dayItems.appendChild(createDayListItem(dateStr, dayNames[date.getDay()], dayTotalSeconds));
   }
   mainTotalLabel.textContent = 'Total This Month';
   mainTotalTime.textContent = formatTime(monthlyTotalSeconds);
-  siteList.innerHTML = dayItemsHtml;
+  siteList.replaceChildren(dayItems);
 }
 
 function renderDayDetail(allData, dateStr) {
@@ -219,18 +263,20 @@ function renderSiteList(data, updateTotal = true) {
   let totalSeconds = 0;
   const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
   if (sorted.length === 0) {
-    siteList.innerHTML = "<li>No usage data for this period.</li>";
+    siteList.replaceChildren(createPopupElement("li", "", "No usage data for this period."));
   } else {
-    siteList.innerHTML = sorted.map(([domain, seconds]) => {
+    const siteItems = document.createDocumentFragment();
+    sorted.forEach(([domain, seconds]) => {
       totalSeconds += seconds;
-      return `<li>
-          <span class="site-icon" aria-hidden="true">
-            <img class="site-icon-image" data-favicon-url="${getFaviconUrl(domain, 32)}" alt="">
-          </span>
-          <span class="domain">${domain}</span>
-          <span class="duration">${formatTime(seconds)}</span>
-        </li>`;
-    }).join('');
+      const item = createPopupElement("li");
+      item.append(
+        createFavicon(domain),
+        createPopupElement("span", "domain", domain),
+        createPopupElement("span", "duration", formatTime(seconds))
+      );
+      siteItems.appendChild(item);
+    });
+    siteList.replaceChildren(siteItems);
     hideUnavailableFavicons(siteList);
   }
 
@@ -418,15 +464,18 @@ function refreshManagedList() {
 }
 
 function renderManagedList(list) {
-  managedSiteList.innerHTML = list.map(domain => `
-    <li class="setting-row">
-      <span class="site-icon" aria-hidden="true">
-        <img class="site-icon-image" data-favicon-url="${getFaviconUrl(domain, 32)}" alt="">
-      </span>
-      <span style="flex: 1;">${domain}</span>
-      <button class="remove-btn" data-domain="${domain}">&times;</button>
-    </li>
-  `).join('');
+  const items = document.createDocumentFragment();
+  list.forEach((domain) => {
+    const item = createPopupElement("li", "setting-row");
+    const label = createPopupElement("span", "");
+    label.style.flex = "1";
+    label.textContent = domain;
+    const removeButton = createPopupElement("button", "remove-btn", "\u00d7");
+    removeButton.dataset.domain = domain;
+    item.append(createFavicon(domain), label, removeButton);
+    items.appendChild(item);
+  });
+  managedSiteList.replaceChildren(items);
 
   hideUnavailableFavicons(managedSiteList);
   managedSiteList.querySelectorAll(".remove-btn").forEach(btn => {
@@ -584,12 +633,12 @@ const SETTINGS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height=
 function setDarkMode(isDark) {
   if (isDark) {
     document.body.classList.add("dark");
-    darkToggleMain.innerHTML = SUN_SVG;
-    darkToggleSettings.innerHTML = SUN_SVG;
+    darkToggleMain.replaceChildren(createPopupSvg(SUN_SVG));
+    darkToggleSettings.replaceChildren(createPopupSvg(SUN_SVG));
   } else {
     document.body.classList.remove("dark");
-    darkToggleMain.innerHTML = MOON_SVG;
-    darkToggleSettings.innerHTML = MOON_SVG;
+    darkToggleMain.replaceChildren(createPopupSvg(MOON_SVG));
+    darkToggleSettings.replaceChildren(createPopupSvg(MOON_SVG));
   }
   localStorage.setItem("darkMode", String(isDark === true));
 }
@@ -604,7 +653,7 @@ function toggleDarkMode() {
 document.addEventListener("DOMContentLoaded", () => {
   setupEventListeners();
   render(); // Initial render (defaults to daily view)
-  settingsBtn.innerHTML = SETTINGS_SVG;
+  settingsBtn.replaceChildren(createPopupSvg(SETTINGS_SVG));
   chrome.storage.local.get(["darkMode", "trackAllWeb", "trackOnlyWhileActive", "trackWhileIdle", "enableNotif"], (result) => {
     setDarkMode(result.darkMode);
     requestAnimationFrame(() => {
